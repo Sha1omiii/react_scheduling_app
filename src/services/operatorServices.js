@@ -1,7 +1,9 @@
 const BACKEND_EXPRESS_URL = import.meta.env.VITE_BACKEND_EXPRESS_URL;
 
 const getAllOperators = async () => {
-  const res = await fetch(`${BACKEND_EXPRESS_URL}/operator`);
+  const res = await fetch(`${BACKEND_EXPRESS_URL}/operator`, {
+    method: 'GET'
+  });
 
   if (!res.ok) {
     throw new Error(`Error while fetching all operators: ${res.status} -- ${res.statusText}`);
@@ -30,6 +32,27 @@ const getOperatorById = async (operatorId, operatorData) => {
   }
 }
 
+const addOperator = async (operator) => {
+  try {
+    const res = await fetch(`${BACKEND_EXPRESS_URL}/operator/addOperator`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(operator)
+    })
+
+    if (!res.ok) {
+      throw new Error(`Http error while adding a new operator: ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log('error adding a new operator ', error);
+  }
+}
+
 const updateOperatorById = async (operatorId, operatorData) => {
   // get the operator id 
   // then make a request using put method and stringify the data of an operator with the id 
@@ -53,4 +76,4 @@ const updateOperatorById = async (operatorId, operatorData) => {
   }
 }
 
-export { getAllOperators, getOperatorById, updateOperatorById } 
+export { getAllOperators, getOperatorById, updateOperatorById, addOperator } 

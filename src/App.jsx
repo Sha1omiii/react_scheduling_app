@@ -1,29 +1,49 @@
 import * as operatorServices from './services/operatorServices';
 import { useState, useEffect } from 'react';
+
 import OperatorDash from './componenets/OperatorDash';
+import HomePage from './componenets/Home';
+import AddOperator from './componenets/AddOperator';
+
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 function App() {
 
-  const BACKEND_EXPRESS_URL = import.meta.env.VITE_BACKEND_EXPRESS_URL;
   const [operators, setOperators] = useState([])
 
-  const getAllOperators = async () => {
-    const res = await operatorServices.getAllOperators();
+  const fetchAllOperators = async () => {
+    try {
+      const res = await operatorServices.getAllOperators();
 
-    if (!res.ok) {
-      throw new Error(`http error getting all operators ${res.statusText}`)
+      setOperators(res)
+    } catch (error) {
+      console.log('error encountered while fetching operators: ', error);
     }
-    setOperators(res)
   }
 
+  const addOperator = async (operatorData) => {
+    try {
+      const newOperator = await operatorServices.addOperator(operatorData);
+      setOperators((prevOperators) => [...prevOperators, newOperator]);
+    } catch (error) {
+      console.log('error encountered while fetching newly added operator');
+    }
+  }
+
+
   useEffect(() => {
-    console.log('updated list of operators: ', operators);
+    fetchAllOperators();
   }, [operators])
   return (
     <>
-      <OperatorDash operators={operators} />
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<HomePage />} />
+          <Route path='/operator' element={< OperatorDash operators={operators} />} />
+          <Route path='/operator/add' element={< AddOperator addOperator={addOperator} />} />
+        </Routes>
+      </BrowserRouter>
 
-      <h1>Testing -- hopefully works</h1>
 
     </>
   )
